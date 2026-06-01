@@ -236,8 +236,11 @@ async def xabar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ─────────────────────────── main ───────────────────────────────
 
-def main():
+import asyncio
+
+async def main():
     db.init_db()
+
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -252,12 +255,22 @@ def main():
     full_webhook_url = f"{WEBHOOK_URL.rstrip('/')}{webhook_path}"
 
     logger.info(f"Webhook: {full_webhook_url}")
-    app.run_webhook(
+
+    await app.initialize()
+    await app.start()
+
+    await app.bot.set_webhook(url=full_webhook_url)
+
+    await app.updater.start_webhook(
         listen="0.0.0.0",
         port=PORT,
         url_path=webhook_path,
-        webhook_url=full_webhook_url,
     )
+
+    await app.updater.idle()
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
 if __name__ == "__main__":
     main()

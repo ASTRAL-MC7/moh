@@ -251,21 +251,21 @@ async def main():
     app.add_handler(CallbackQueryHandler(get_gift_callback, pattern="^get_gift$"))
     app.add_handler(ChatJoinRequestHandler(join_request_handler))
 
-    webhook_path = f"/webhook/{BOT_TOKEN}"
-    full_webhook_url = f"{WEBHOOK_URL.rstrip('/')}{webhook_path}"
-
-    logger.info(f"Webhook: {full_webhook_url}")
-
     await app.initialize()
     await app.start()
 
-    await app.bot.set_webhook(url=full_webhook_url)
+    webhook_path = f"/webhook/{BOT_TOKEN}"
+    full_webhook_url = f"{WEBHOOK_URL.rstrip('/')}{webhook_path}"
 
-    await app.updater.start_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        url_path=webhook_path,
-    )
+    await app.bot.set_webhook(full_webhook_url)
+
+    # IMPORTANT: use run_polling OR external webhook server (Render + PTB limitation)
+    await app.updater.start_polling()  # fallback stable mode
+
+    await app.updater.idle()
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
     await app.updater.idle()
 

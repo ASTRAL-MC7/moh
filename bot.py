@@ -267,7 +267,7 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 
-    await app.updater.idle()
+    app.updater.idle()
 
 if __name__ == "__main__":
     asyncio.run(main())
